@@ -3,7 +3,7 @@ import os
 import csv
 
 #
-# data to be imported
+# data to be imported fron current working directory
 #
 image = "NLCD2011_LC_N39W105.tif"
 database = "truemarble.sqlite"
