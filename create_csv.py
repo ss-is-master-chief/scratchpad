@@ -14,8 +14,8 @@ curs = conn.cursor()
 #
 # setting up metadata
 #
-curs.execute("SELECT load_extension('mod_spatialite');")
-curs.execute("SELECT InitSpatialMetaData(1);")
+curs.execute("SELECT load_extension('mod_spatialite');") # OperationalError: not authorized
+curs.execute("SELECT InitSpatialMetaData(1);") # if Line 17 removed : Error - no such function 'InitSpatialMetaData()'
 
 curs.fetchall()
 
