@@ -1,31 +1,42 @@
 import sqlite3
+import os
+import csv
 
-# 
-# connecting to example database
 #
+# data to be imported
+#
+image = "NLCD2011_LC_N39W105.tif"
 database = "truemarble.sqlite"
+
 conn = sqlite3.connect(database)
 curs = conn.cursor()
 
 #
-# get table names from example database
+# setting up metadata
 #
+curs.execute("SELECT load_extension('mod_spatialite');")
+curs.execute("SELECT InitSpatialMetaData(1);")
+
+curs.fetchall()
+
+#
+# loading raster data from objects
+#
+os.system("rasterlite_load -d truemarble.sqlite -T TrueMarble -D . -t")
+os.system("rasterlite_load -d truemarble.sqlite -T TrueMarble -D . -v")
+
 curs.execute("SELECT tbl_name FROM sqlite_master WHERE type='table';")
 tables = curs.fetchall()
 
-#
-# CSV file generation 
-#
 for i in tables:
     print('Creating CSV for: ',i[0])
     curs.execute("SELECT * FROM %s;" % i[0])
     ex = curs.fetchall()
-
     for row in ex :
         list = []
-        for sub_value in row:
-            value = str(sub_value)
-            list.append(value)
-        file = open('./database/%s.csv'% i[0], 'a') #opens respective CSV file in append mode
+        for j in row:
+            value = str(j)
+            list.append(value)    
+        file = open('./%s.csv'% i[0], 'a')
         ex = csv.writer(file)
         ex.writerow(list)
