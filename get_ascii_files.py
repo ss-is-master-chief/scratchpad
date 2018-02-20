@@ -14,35 +14,46 @@ def get_grid_files():
 
 def install_grid(file_name):
 
-    if(os.path.exists('{}.csv'.format(file_name))):
+    file_name = file_name.strip('.asc')
+    print(file_name)
+
+    file_type = 'asc'
+    convert_to = 'csv'
+
+    '''Will overwrite/update file if it already exists'''
+
+    if(os.path.exists('{}.{}'.format(file_name,convert_to))):
         print("Overwriting previous changes...")
-        open('{}.csv'.format(file_name), 'w').close()
+        open('{}.{}'.format(file_name,convert_to), 'w').close()
 
-    file = open("{}.csv".format(file_name),'a')
+    file = open("{}.{}".format(file_name,convert_to),'a')
 
-    n_col = linecache.getline('{}'.format(file_name),1).split(' ')
+    '''Fetching meta-data for file'''
+
+    n_col = linecache.getline('{}.{}'.format(file_name,file_type),1).split(' ')
     n_col = n_col[1]
 
-    n_row = linecache.getline('{}'.format(file_name),2).split(' ')
+    n_row = linecache.getline('{}.{}'.format(file_name,file_type),2).split(' ')
     n_row = int(n_row[1])
+    print(n_row)
 
-    xllcenter = linecache.getline('{}'.format(file_name),3).split(' ')
+    xllcenter = linecache.getline('{}.{}'.format(file_name,file_type),3).split(' ')
     xllcenter = xllcenter[1]
 
-    yllcenter = linecache.getline('{}'.format(file_name),4).split(' ')
+    yllcenter = linecache.getline('{}.{}'.format(file_name,file_type),4).split(' ')
     yllcenter = yllcenter[1]
 
-    cellsize = linecache.getline('{}'.format(file_name),5).split(' ')
+    cellsize = linecache.getline('{}.{}'.format(file_name,file_type),5).split(' ')
     cellsize = cellsize[1]
 
-    NODATA_value = linecache.getline('{}'.format(file_name),6).split(' ')
+    NODATA_value = linecache.getline('{}.{}'.format(file_name,file_type),6).split(' ')
     NODATA_value = NODATA_value[1]
 
     results = []
 
     for i in range(7,n_row+7):
 
-        each_line = linecache.getline('{}'.format(file_name),i).split(' ')
+        each_line = linecache.getline('{}.{}'.format(file_name,file_type),i).split(' ')
         print("Entering row",(i-6))
         results.append(list(map(int, each_line)))
 
@@ -65,4 +76,5 @@ def process_grid():
         install_grid(file)
 
 if __name__=='__main__':
+    
     process_grid()
