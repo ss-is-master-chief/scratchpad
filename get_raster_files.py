@@ -167,15 +167,18 @@ def install_grid(file_name):
 
     results = []
 
-    for i in range(7,n_row):
+    for i in range(7,n_row+7):
 
         each_line = linecache.getline('{}'.format(file_name),i).split(' ')
+        print("Entering row",(i-6))
         results.append(list(map(int, each_line)))
 
-        data_frame = pd.DataFrame(results)
-        data_frame.to_csv(file, header=False, index=False)
+    print("Creating CSV..")
 
-        file.close()
+    data_frame = pd.DataFrame(results)
+    data_frame.to_csv(file, header=False, index=False)
+
+    print("Done")
 
 '''Interative for installing for all .asc files'''
 
