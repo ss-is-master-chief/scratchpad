@@ -5,6 +5,7 @@ import sqlite3
 import csv
 import linecache
 import pandas as pd
+import os.path
 
 # Resolve link : https://gis.stackexchange.com/questions/233654/install-gdal-python-binding-on-mac
 
@@ -132,8 +133,6 @@ def create_csv(tables, file_name, curs):
 # ESRI GRID
 #
 
-'''Function to files ending with asc'''
-
 def get_grid_files():
 
     files_grid = []
@@ -145,31 +144,46 @@ def get_grid_files():
 
 def install_grid(file_name):
 
-    file = open("{}.csv".format(file_name),'a')
+    file_name = file_name.strip('.asc')
+    print(file_name)
 
-    n_col = linecache.getline('{}'.format(file_name),1).split(' ')
+    file_type = 'asc'
+    convert_to = 'csv'
+
+    '''Will overwrite/update file if it already exists'''
+
+    if(os.path.exists('{}.{}'.format(file_name,convert_to))):
+        print("Overwriting previous changes...")
+        open('{}.{}'.format(file_name,convert_to), 'w').close()
+
+    file = open("{}.{}".format(file_name,convert_to),'a')
+
+    '''Fetching meta-data for file'''
+
+    n_col = linecache.getline('{}.{}'.format(file_name,file_type),1).split(' ')
     n_col = n_col[1]
 
-    n_row = linecache.getline('{}'.format(file_name),2).split(' ')
+    n_row = linecache.getline('{}.{}'.format(file_name,file_type),2).split(' ')
     n_row = int(n_row[1])
+    print(n_row)
 
-    xllcenter = linecache.getline('{}'.format(file_name),3).split(' ')
+    xllcenter = linecache.getline('{}.{}'.format(file_name,file_type),3).split(' ')
     xllcenter = xllcenter[1]
 
-    yllcenter = linecache.getline('{}'.format(file_name),4).split(' ')
+    yllcenter = linecache.getline('{}.{}'.format(file_name,file_type),4).split(' ')
     yllcenter = yllcenter[1]
 
-    cellsize = linecache.getline('{}'.format(file_name),5).split(' ')
+    cellsize = linecache.getline('{}.{}'.format(file_name,file_type),5).split(' ')
     cellsize = cellsize[1]
 
-    NODATA_value = linecache.getline('{}'.format(file_name),6).split(' ')
+    NODATA_value = linecache.getline('{}.{}'.format(file_name,file_type),6).split(' ')
     NODATA_value = NODATA_value[1]
 
     results = []
 
     for i in range(7,n_row+7):
 
-        each_line = linecache.getline('{}'.format(file_name),i).split(' ')
+        each_line = linecache.getline('{}.{}'.format(file_name,file_type),i).split(' ')
         print("Entering row",(i-6))
         results.append(list(map(int, each_line)))
 
@@ -180,10 +194,13 @@ def install_grid(file_name):
 
     print("Done")
 
+    file.close()
+
 '''Interative for installing for all .asc files'''
 
 def process_grid():
 
     files = get_grid_files()
+    print(files)
     for file in files:
         install_grid(file)
