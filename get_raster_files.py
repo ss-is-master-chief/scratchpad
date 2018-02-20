@@ -3,6 +3,8 @@ import glob
 import numpy as np
 import sqlite3
 import csv
+import linecache
+import pandas as pd
 
 # Resolve link : https://gis.stackexchange.com/questions/233654/install-gdal-python-binding-on-mac
 
@@ -25,6 +27,9 @@ version_num = int(gdal.VersionInfo('VERSION_NUM'))
 if version_num < 1100000:
     sys.exit('ERROR: Python bindings of GDAL 1.10 or later required')
 
+#
+# HDF5
+#
 
 '''Function to get files ending with .h5'''
 
@@ -60,6 +65,10 @@ def go_through_hdf_file():
 
     for file in files_hdf:
         open_hdf_file(file)
+
+#
+# GeoTIFF
+#
 
 '''Function to get files ending with .tif'''
 
@@ -118,3 +127,60 @@ def create_csv(tables, file_name, curs):
             file_data = open('.{}_files/{}.csv'.format(file_name,i[0]), 'a')
             ex = csv.writer(file_data)
             ex.writerow(list)
+
+#
+# ESRI GRID
+#
+
+'''Function to files ending with asc'''
+
+def get_grid_files():
+
+    files_grid = []
+    for file in glob.glob("*.asc"):
+        files_grid.append(file)
+    return files_grid
+
+'''Converting asc files into CSV'''
+
+def install_grid(file_name):
+
+    file = open("{}.csv".format(file_name),'a')
+
+    n_col = linecache.getline('{}'.format(file_name),1).split(' ')
+    n_col = n_col[1]
+
+    n_row = linecache.getline('{}'.format(file_name),2).split(' ')
+    n_row = int(n_row[1])
+
+    xllcenter = linecache.getline('{}'.format(file_name),3).split(' ')
+    xllcenter = xllcenter[1]
+
+    yllcenter = linecache.getline('{}'.format(file_name),4).split(' ')
+    yllcenter = yllcenter[1]
+
+    cellsize = linecache.getline('{}'.format(file_name),5).split(' ')
+    cellsize = cellsize[1]
+
+    NODATA_value = linecache.getline('{}'.format(file_name),6).split(' ')
+    NODATA_value = NODATA_value[1]
+
+    results = []
+
+    for i in range(7,n_row):
+
+        each_line = linecache.getline('{}'.format(file_name),i).split(' ')
+        results.append(list(map(int, each_line)))
+
+        data_frame = pd.DataFrame(results)
+        data_frame.to_csv(file, header=False, index=False)
+
+        file.close()
+
+'''Interative for installing for all .asc files'''
+
+def process_grid():
+
+    files = get_grid_files()
+    for file in files:
+        install_grid(file)
