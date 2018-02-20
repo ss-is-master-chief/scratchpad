@@ -1,6 +1,7 @@
 import glob
 import linecache
 import pandas as pd
+import os.path
 
 def get_grid_files():
 
@@ -12,6 +13,10 @@ def get_grid_files():
 '''Converting asc files into CSV'''
 
 def install_grid(file_name):
+
+    if(os.path.exists('{}.csv'.format(file_name))):
+        print("Overwriting previous changes...")
+        open('{}.csv'.format(file_name), 'w').close()
 
     file = open("{}.csv".format(file_name),'a')
 
